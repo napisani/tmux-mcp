@@ -1,0 +1,14 @@
+session_name: 'tmux-mcp'
+windows:
+- focus: 'true'
+  # get with:  tmux display-message -p "#{window_layout}"
+  layout: b2ff,257x65,0,0{129x65,0,0,9,127x65,130,0[127x24,130,0,10,127x23,130,25,12,127x16,130,49,24]}
+  options: {}
+  panes:
+  - focus: 'true'
+    shell_command: nvim 
+  - 'tail -f /tmp/tmux-mcp.log' 
+  - 'make watch'
+  - 'make inspect'
+  start_directory: '/Users/nick/code/tmux-mcp/' 
+  window_name: 'tmux-mcp' 

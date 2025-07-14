@@ -5,6 +5,7 @@ BINARY_NAME=$(APP_NAME)
 VERSION=0.1.0
 BUILD_DIR=bin
 SRC_DIR=cmd/$(APP_NAME)
+INTERNAL_DIR=internal
 
 # Build the binary
 .PHONY: build
@@ -35,7 +36,7 @@ dist: build
 .PHONY: watch
 watch:
 	@echo "Watching for changes..."
-	@nodemon  --exec "make build ; exit 0" --watch $(SRC_DIR) --ext go  --signal SIGINT  
+	@nodemon  --exec "make build ; exit 0" --watch $(SRC_DIR) --watch $(INTERNAL_DIR) --ext go  --signal SIGINT  
 
 .PHONY: inspect
 inspect:

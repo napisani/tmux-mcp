@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
+	"os"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -10,7 +13,23 @@ import (
 	"github.com/napisani/tmux-mcp/internal/tool"
 )
 
+func setupLogging(verbose bool) {
+	if verbose {
+		logFile, err := os.OpenFile("/tmp/tmux-mcp.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatalf("failed to open log file: %v", err)
+		}
+		log.SetOutput(logFile)
+		log.Println("Logging started")
+	} else {
+		log.SetOutput(io.Discard)
+	}
+}
+
 func main() {
+
+	setupLogging(true)
+
 	// Create a new MCP server
 	s := server.NewMCPServer(
 		"tmux-mcp",
