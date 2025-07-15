@@ -8,10 +8,9 @@ import (
 
 	"github.com/GianlucaP106/gotmux/gotmux"
 	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/napisani/tmux-mcp/internal/desc"
 )
 
-const defaultLines = 200 
+const defaultLines = 200
 
 func matchPaneId(paneId string, pane *gotmux.Pane) bool {
 	return paneId == pane.Id || string('%')+paneId == pane.Id
@@ -72,41 +71,42 @@ func HandleGetPaneOutput(ctx context.Context, request mcp.CallToolRequest) (*mcp
 	return mcp.NewToolResultText(content), nil
 }
 
-// Resource definitions
-func GetPaneOutputResource() mcp.Resource {
-	description := desc.PaneOutputDescription
-	return mcp.NewResource(
-		"pane_output://{session_name}/{window_index}/{pane_id}",
-		"Tmux Pane Output",
-		mcp.WithResourceDescription(description),
-		mcp.WithMIMEType("text/markdown"),
-	)
-}
+// // Resource definitions
+// func GetPaneOutputResource() mcp.Resource {
+// 	description := desc.PaneOutputDescription
+// 	return mcp.NewResource(
+// 		"pane_output://{session_name}/{window_index}/{pane_id}",
+// 		"Tmux Pane Output",
+// 		mcp.WithResourceDescription(description),
+// 		mcp.WithMIMEType("text/markdown"),
+// 	)
+// }
 
-func HandlePaneOutputResource(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-	fields := request.Params.URI[len("pane_output://"):]
-	var sessionName, paneId string
-	var windowIndex int
-	_, err := fmt.Sscanf(fields, "%s/%d/%s", &sessionName, &windowIndex, &paneId)
-	if err != nil {
-		log.Printf("Error: Failed to parse URI: %v", err)
-		return nil, err
-	}
+// func HandlePaneOutputResource(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+// 	log.Printf("Handling pane output resource request: %s", request.Params.URI)
+// 	fields := request.Params.URI[len("pane_output://"):]
+// 	var sessionName, paneId string
+// 	var windowIndex int
+// 	_, err := fmt.Sscanf(fields, "%s/%d/%s", &sessionName, &windowIndex, &paneId)
+// 	if err != nil {
+// 		log.Printf("Error: Failed to parse URI: %v", err)
+// 		return nil, err
+// 	}
 
-	lines := defaultLines
-	content, err := getPaneOutput(paneId, sessionName, windowIndex, lines)
-	if err != nil {
-		return nil, err
-	}
+// 	lines := defaultLines
+// 	content, err := getPaneOutput(paneId, sessionName, windowIndex, lines)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return []mcp.ResourceContents{
-		mcp.TextResourceContents{
-			URI:      request.Params.URI,
-			MIMEType: "text/markdown",
-			Text:     content,
-		},
-	}, nil
-}
+// 	return []mcp.ResourceContents{
+// 		mcp.TextResourceContents{
+// 			URI:      request.Params.URI,
+// 			MIMEType: "text/markdown",
+// 			Text:     content,
+// 		},
+// 	}, nil
+// }
 
 // Shared implementation
 func getPaneOutput(paneId string, sessionName string, windowIndex int, lines int) (string, error) {

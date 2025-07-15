@@ -39,7 +39,6 @@ func main() {
 	s.AddResource(tmuxmcp.GetSessionsListResource(), tmuxmcp.HandleSessionsListResource)
 	s.AddResource(tmuxmcp.GetWindowsListResource(), tmuxmcp.HandleWindowsListResource)
 	s.AddResource(tmuxmcp.GetPanesListResource(), tmuxmcp.HandlePanesListResource)
-	s.AddResource(tmuxmcp.GetPaneOutputResource(), tmuxmcp.HandlePaneOutputResource)
 
 	// Add tool handler
 	// s.AddTool(tool, helloHandler)
