@@ -1,68 +1,47 @@
 package exec
 
 import (
+	"bytes"
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 )
 
-// Commander provides functionality to interact with tmux sessions
 type Commander struct {
-	TmuxPath string // Path to tmux binary
+	// Optional path to tmux binary, defaults to "tmux" in PATH
+	TmuxPath string
 }
 
-// NewCommander creates a new Commander with the default tmux path
 func NewCommander() *Commander {
 	return &Commander{
-		TmuxPath: "tmux", // Default assumes tmux is in PATH
+		TmuxPath: "tmux",
 	}
 }
 
-// RunCommand executes a command in the specified tmux session.
-// If sessionID is empty, the command runs in the default/current session.
-// Returns stdout output and any error encountered.
-func (c *Commander) RunCommand(sessionID string, command string) (string, error) {
-	// Validate command input
-	if command == "" {
-		return "", fmt.Errorf("command cannot be empty")
-	}
+// Run executes a tmux command and returns its output
+func (c *Commander) Run(args ...string) (string, error) {
+	cmd := exec.Command(c.TmuxPath, args...)
+	log.Println("Executing tmux command:", cmd.String())
 
-	var cmd *exec.Cmd
-
-	// If sessionID is provided, run in that specific session
-	// Otherwise, run in the default session
-	if sessionID != "" {
-		cmd = exec.Command(c.TmuxPath, "run-shell", "-t", sessionID, command)
-	} else {
-		cmd = exec.Command(c.TmuxPath, "run-shell", command)
-	}
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("failed to execute command in tmux session: %w, output: %s",
-			err, strings.TrimSpace(string(output)))
-	}
-
-	return strings.TrimSpace(string(output)), nil
-}
-
-// SessionExists checks if the specified tmux session exists
-// If sessionID is empty, it checks if any tmux session exists
-func (c *Commander) SessionExists(sessionID string) (bool, error) {
-	var cmd *exec.Cmd
-
-	if sessionID != "" {
-		cmd = exec.Command(c.TmuxPath, "has-session", "-t", sessionID)
-	} else {
-		// Check if there's any session running
-		cmd = exec.Command(c.TmuxPath, "has-session")
-	}
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
 	err := cmd.Run()
 	if err != nil {
-		// Exit code 1 typically means session doesn't exist
-		return false, nil
+		log.Printf("tmux command failed: %v, stderr: %s", err, stderr.String())
+		return "", fmt.Errorf("tmux command failed: %v, stderr: %s", err, stderr.String())
 	}
 
-	return true, nil
+	return strings.TrimSpace(stdout.String()), nil
+}
+
+// RunRaw executes a raw tmux command string
+func (c *Commander) RunRaw(cmdStr string) (string, error) {
+	args := []string{}
+	if cmdStr != "" {
+		args = append(args, strings.Split(cmdStr, " ")...)
+	}
+	return c.Run(args...)
 }

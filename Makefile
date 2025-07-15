@@ -42,6 +42,14 @@ watch:
 inspect:
 	@echo "Inspecting the application..."
 	@npx   npx @modelcontextprotocol/inspector  ./bin/$(BINARY_NAME) 
+
+.PHONY: tidy 
+tidy:
+	@echo "Tidying up dependencies..."
+	go mod tidy 
+
+
+
 # Help command
 .PHONY: help
 help:
@@ -52,7 +60,9 @@ help:
 	@echo "  make dist    - Create a distribution archive"
 	@echo "  make watch   - Watch for changes and rebuild"
 	@echo "  make inspect - Inspect the application with Model Context Protocol"
+	@echo "  make tidy - Tidy up dependencies"
 	@echo "  make help    - Show this help message"
+
 
 
 

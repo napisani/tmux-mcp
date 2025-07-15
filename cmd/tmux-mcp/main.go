@@ -9,8 +9,7 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
-	"github.com/napisani/tmux-mcp/internal/resource"
-	"github.com/napisani/tmux-mcp/internal/tool"
+	"github.com/napisani/tmux-mcp/internal/tmuxmcp"
 )
 
 func setupLogging(verbose bool) {
@@ -37,25 +36,16 @@ func main() {
 		server.WithToolCapabilities(false),
 	)
 
-	// // Define a simple tool
-	// tool := mcp.NewTool("hello_world",
-	// 	mcp.WithDescription("Say hello to someone"),
-	// 	mcp.WithString("name",
-	// 		mcp.Required(),
-	// 		mcp.Description("Name of the person to greet"),
-	// 	),
-	// )
-
-	s.AddResource(resource.GetSessionsListResource(), resource.HandleSessionsList)
-	s.AddResource(resource.GetWindowsListResource(), resource.HandleWindowsList)
-	s.AddResource(resource.GetPanesListResource(), resource.HandlePanesList)
-	s.AddResource(resource.GetPaneOutputResource(), resource.HandleGetPaneOutput)
+	s.AddResource(tmuxmcp.GetSessionsListResource(), tmuxmcp.HandleSessionsListResource)
+	s.AddResource(tmuxmcp.GetWindowsListResource(), tmuxmcp.HandleWindowsListResource)
+	s.AddResource(tmuxmcp.GetPanesListResource(), tmuxmcp.HandlePanesListResource)
+	s.AddResource(tmuxmcp.GetPaneOutputResource(), tmuxmcp.HandlePaneOutputResource)
 
 	// Add tool handler
 	// s.AddTool(tool, helloHandler)
-	s.AddTool(tool.GetSessionListTool(), tool.HandleSessionsList)
-	s.AddTool(tool.GetWindowsListTool(), tool.HandleWindowsList)
-	s.AddTool(tool.GetPaneOutputTool(), tool.HandleGetPaneOutput)
+	s.AddTool(tmuxmcp.GetSessionListTool(), tmuxmcp.HandleSessionsList)
+	s.AddTool(tmuxmcp.GetWindowsListTool(), tmuxmcp.HandleWindowsList)
+	s.AddTool(tmuxmcp.GetPaneOutputTool(), tmuxmcp.HandleGetPaneOutput)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {

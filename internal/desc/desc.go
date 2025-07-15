@@ -31,6 +31,7 @@ Pid            PID of first process in pane
 Pipe           1 if pane is being piped
 Right          Right of pane
 SearchString   Last search string in copy mode
+SesssionName    Name of session containing pane
 StartCommand   Command pane started with
 StartPath      Path pane started with
 Synchronized   1 if pane is synchronized
@@ -40,6 +41,7 @@ Top            Top of pane
 Tty            Pseudo terminal of pane
 UnseenChanges  1 if there were changes in pane while in mode
 Width          Width of pane
+WindowIndex    Index of window containing pane
 `
 
 const SessionListDescription = "The sessions in the current tmux server. These are the attributes of each session:\n" + `
