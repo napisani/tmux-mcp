@@ -42,6 +42,7 @@ Tty            Pseudo terminal of pane
 UnseenChanges  1 if there were changes in pane while in mode
 Width          Width of pane
 WindowIndex    Index of window containing pane
+McpTag 			   MCP tag for this pane, can be used by to identify panes marked by the tmux user 
 `
 
 const SessionListDescription = "The sessions in the current tmux server. These are the attributes of each session:\n" + `

@@ -45,6 +45,7 @@ func main() {
 	s.AddTool(tmuxmcp.GetSessionListTool(), tmuxmcp.HandleSessionsList)
 	s.AddTool(tmuxmcp.GetWindowsListTool(), tmuxmcp.HandleWindowsList)
 	s.AddTool(tmuxmcp.GetPaneOutputTool(), tmuxmcp.HandleGetPaneOutput)
+	s.AddTool(tmuxmcp.GetPaneByTagTool(), tmuxmcp.HandleFindPaneByTag)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {

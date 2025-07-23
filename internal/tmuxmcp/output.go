@@ -12,7 +12,7 @@ import (
 
 const defaultLines = 200
 
-func matchPaneId(paneId string, pane *gotmux.Pane) bool {
+func matchPaneId(paneId string, pane *McpPane) bool {
 	return paneId == pane.Id || string('%')+paneId == pane.Id
 }
 
@@ -125,7 +125,7 @@ func getPaneOutput(paneId string, sessionName string, windowIndex int, lines int
 
 	var paneExists bool
 	for _, pane := range panes {
-		if matchPaneId(paneId, pane) {
+		if matchPaneId(paneId, &McpPane{Pane: pane}) {
 			paneExists = true
 			break
 		}
