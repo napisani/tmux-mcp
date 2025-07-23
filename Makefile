@@ -48,7 +48,15 @@ tidy:
 	@echo "Tidying up dependencies..."
 	go mod tidy 
 
+.PHONY: test
+test:
+	@echo "Running tests..."
+	go test ./... -v
 
+.PHONY: watch-test 
+watch-test:
+	@echo "Watching for test changes..."
+	@nodemon --exec "make test ; exit 0" --watch $(SRC_DIR) --watch $(INTERNAL_DIR) --ext go --signal SIGINT
 
 # Help command
 .PHONY: help
