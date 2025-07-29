@@ -1,2 +1,4 @@
 bin/
 .direnv/
+./tmux-mcp
+./main

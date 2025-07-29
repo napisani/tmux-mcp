@@ -39,6 +39,7 @@ func main() {
 	s.AddResource(tmuxmcp.GetSessionsListResource(), tmuxmcp.HandleSessionsListResource)
 	s.AddResource(tmuxmcp.GetWindowsListResource(), tmuxmcp.HandleWindowsListResource)
 	s.AddResource(tmuxmcp.GetPanesListResource(), tmuxmcp.HandlePanesListResource)
+	s.AddResourceTemplate(tmuxmcp.GetPaneOutputResourceTemplate(), tmuxmcp.HandlePaneOutputResourceTemplate)
 
 	// Add tool handler
 	// s.AddTool(tool, helloHandler)
@@ -46,6 +47,9 @@ func main() {
 	s.AddTool(tmuxmcp.GetWindowsListTool(), tmuxmcp.HandleWindowsList)
 	s.AddTool(tmuxmcp.GetPaneOutputTool(), tmuxmcp.HandleGetPaneOutput)
 	s.AddTool(tmuxmcp.GetPaneByTagTool(), tmuxmcp.HandleFindPaneByTag)
+
+	// Execute command tool
+	s.AddTool(tmuxmcp.ExecuteCommandTool(), tmuxmcp.HandleExecuteCommand)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {

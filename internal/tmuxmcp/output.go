@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/GianlucaP106/gotmux/gotmux"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/napisani/tmux-mcp/internal/desc"
 )
 
 const defaultLines = 200
@@ -71,42 +74,55 @@ func HandleGetPaneOutput(ctx context.Context, request mcp.CallToolRequest) (*mcp
 	return mcp.NewToolResultText(content), nil
 }
 
-// // Resource definitions
-// func GetPaneOutputResource() mcp.Resource {
-// 	description := desc.PaneOutputDescription
-// 	return mcp.NewResource(
-// 		"pane_output://{session_name}/{window_index}/{pane_id}",
-// 		"Tmux Pane Output",
-// 		mcp.WithResourceDescription(description),
-// 		mcp.WithMIMEType("text/markdown"),
-// 	)
-// }
+// Resource template definitions
+func GetPaneOutputResourceTemplate() mcp.ResourceTemplate {
+	description := desc.PaneOutputDescription
+	return mcp.NewResourceTemplate(
+		"pane_output://{session_name}/{window_index}/{pane_id}",
+		"Tmux Pane Output",
+		mcp.WithTemplateDescription(description),
+		mcp.WithTemplateMIMEType("text/markdown"),
+	)
+}
 
-// func HandlePaneOutputResource(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-// 	log.Printf("Handling pane output resource request: %s", request.Params.URI)
-// 	fields := request.Params.URI[len("pane_output://"):]
-// 	var sessionName, paneId string
-// 	var windowIndex int
-// 	_, err := fmt.Sscanf(fields, "%s/%d/%s", &sessionName, &windowIndex, &paneId)
-// 	if err != nil {
-// 		log.Printf("Error: Failed to parse URI: %v", err)
-// 		return nil, err
-// 	}
+func HandlePaneOutputResourceTemplate(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+	log.Printf("Handling pane output resource request: %s", request.Params.URI)
 
-// 	lines := defaultLines
-// 	content, err := getPaneOutput(paneId, sessionName, windowIndex, lines)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	// Parse the URI: pane_output://session_name/window_index/pane_id
+	if !strings.HasPrefix(request.Params.URI, "pane_output://") {
+		return nil, fmt.Errorf("invalid URI scheme, expected pane_output://")
+	}
 
-// 	return []mcp.ResourceContents{
-// 		mcp.TextResourceContents{
-// 			URI:      request.Params.URI,
-// 			MIMEType: "text/markdown",
-// 			Text:     content,
-// 		},
-// 	}, nil
-// }
+	path := request.Params.URI[len("pane_output://"):]
+	parts := strings.Split(path, "/")
+
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid URI format, expected pane_output://session_name/window_index/pane_id, got: %s", request.Params.URI)
+	}
+
+	sessionName := parts[0]
+	windowIndexStr := parts[1]
+	paneId := parts[2]
+
+	windowIndex, err := strconv.Atoi(windowIndexStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid window_index '%s': %w", windowIndexStr, err)
+	}
+
+	lines := defaultLines
+	content, err := getPaneOutput(paneId, sessionName, windowIndex, lines)
+	if err != nil {
+		return nil, err
+	}
+
+	return []mcp.ResourceContents{
+		mcp.TextResourceContents{
+			URI:      request.Params.URI,
+			MIMEType: "text/markdown",
+			Text:     content,
+		},
+	}, nil
+}
 
 // Shared implementation
 func getPaneOutput(paneId string, sessionName string, windowIndex int, lines int) (string, error) {

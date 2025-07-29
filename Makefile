@@ -58,6 +58,11 @@ watch-test:
 	@echo "Watching for test changes..."
 	@nodemon --exec "make test ; exit 0" --watch $(SRC_DIR) --watch $(INTERNAL_DIR) --ext go --signal SIGINT
 
+
+.PHONEY tmux-list-panes:
+	@echo "Listing tmux panes..."
+	@tmux list-panes -a -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command}'	
+
 # Help command
 .PHONY: help
 help:
