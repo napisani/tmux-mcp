@@ -100,26 +100,29 @@ func executeCommandInPane(session string, windowIdx int, paneID, cmd string) (st
 		return "", fmt.Errorf("failed to create temporary file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
-	tmpFile.Close() // we will only read it later
+	tmpFile.Close()
 
-	// Build the full shell command that tees output.
-	// Use bash -c to ensure redirections work regardless of user's shell.
-	wrapped := fmt.Sprintf("bash -c '%s 2>&1 | tee %s'", escapeSingleQuotes(cmd), tmpPath)
+	// Unique wait token so concurrent calls don't clash.
+	token := fmt.Sprintf("mcp_%d", time.Now().UnixNano())
+
+	// Build the shell wrapper:
+	//   (<cmd> 2>&1 | tee tmp); tmux wait-for -S <token>
+	wrapped := fmt.Sprintf("bash -c '(%s 2>&1 | tee %s); tmux wait-for -S %s'", escapeSingleQuotes(cmd), tmpPath, token)
 
 	target := fmt.Sprintf("%s:%d.%s", session, windowIdx, paneID)
 	log.Printf("Sending command to pane %s: %s", target, cmd)
 
-	// Send the command followed by Enter.
+	// Inject command.
 	if _, err := tmux.Command("send-keys", "-t", target, wrapped, "C-m"); err != nil {
 		return "", fmt.Errorf("failed to send command to pane: %w", err)
 	}
 
-	// Give the command a little time to run and flush output. This is heuristic
-	// but generally sufficient for most quick commands. For long-running
-	// commands the caller will likely request pane output separately.
-	time.Sleep(500 * time.Millisecond)
+	// Block until the pane-side command signals completion.
+	if _, err := tmux.Command("wait-for", token); err != nil {
+		return "", fmt.Errorf("wait-for failure: %w", err)
+	}
 
-	// Read captured output.
+	// Read captured output after command has finished.
 	data, err := os.ReadFile(tmpPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read captured output: %w", err)
