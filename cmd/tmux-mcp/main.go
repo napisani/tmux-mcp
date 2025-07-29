@@ -51,6 +51,9 @@ func main() {
 	// Execute command tool
 	s.AddTool(tmuxmcp.ExecuteCommandTool(), tmuxmcp.HandleExecuteCommand)
 
+	// Execute async tool
+	s.AddTool(tmuxmcp.ExecuteAsyncTool(), tmuxmcp.HandleExecuteAsync)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
