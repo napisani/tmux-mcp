@@ -12,8 +12,8 @@ import (
 // ExecuteAsyncTool defines the MCP tool that kicks off a command in a given
 // pane without waiting to capture its output. Think of it as a fire-and-forget
 // variant of ExecuteCommand.
-func ExecuteAsyncTool() mcp.Tool {
-	return mcp.NewTool("execute_async",
+func ExecuteCommandAsyncTool() mcp.Tool {
+	return mcp.NewTool("execute_command_async",
 		mcp.WithDescription("Execute a shell command in a tmux pane without waiting for output (async)"),
 		mcp.WithString("pane_id",
 			mcp.Required(),

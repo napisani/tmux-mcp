@@ -52,7 +52,7 @@ func main() {
 	s.AddTool(tmuxmcp.ExecuteCommandTool(), tmuxmcp.HandleExecuteCommand)
 
 	// Execute async tool
-	s.AddTool(tmuxmcp.ExecuteAsyncTool(), tmuxmcp.HandleExecuteAsync)
+	s.AddTool(tmuxmcp.ExecuteCommandAsyncTool(), tmuxmcp.HandleExecuteAsync)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
